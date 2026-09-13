@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "web": "webpack serve --mode development",
+    "build": "webpack --mode production",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
@@ -57,6 +58,6 @@
     "webpack-dev-server": "^6.0.0"
   },
   "engines": {
-    "node": ">= 22.11.0"
+    "node": ">=22.11.0"
   }
 }
