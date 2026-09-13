@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+﻿import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   View,
@@ -14,7 +14,12 @@ import {
    CONFIG
 ========================================================= */
 
-const API_URL = 'http://localhost:5000';
+const API_URL =
+  typeof window !== 'undefined' &&
+  window.location.hostname !== 'localhost' &&
+  window.location.hostname !== '127.0.0.1'
+    ? 'https://ai-interview-bhta.onrender.com'
+    : 'http://localhost:5000';
 
 /* =========================================================
    CLEAN AI TEXT
@@ -33,7 +38,7 @@ function cleanMarkdown(text) {
     .replace(/__(.*?)__/g, '$1')
     .replace(/`([^`]*)`/g, '$1')
     .replace(/\|/g, ' ')
-    .replace(/^\s*[-*+]\s+/gm, '• ')
+    .replace(/^\s*[-*+]\s+/gm, '- ')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
@@ -73,21 +78,13 @@ export default function InterviewScreen({ route, navigation }) {
   ======================================================= */
 
   const [question, setQuestion] = useState('');
-
   const [answer, setAnswer] = useState('');
-
   const [correctAnswer, setCorrectAnswer] = useState('');
-
   const [loadingQuestion, setLoadingQuestion] = useState(true);
-
   const [loadingAnswer, setLoadingAnswer] = useState(false);
-
   const [error, setError] = useState('');
-
   const [isSpeaking, setIsSpeaking] = useState(false);
-
   const [isListening, setIsListening] = useState(false);
-
   const [speechSupported, setSpeechSupported] = useState(false);
 
   /* =======================================================
@@ -95,7 +92,6 @@ export default function InterviewScreen({ route, navigation }) {
   ======================================================= */
 
   const recognitionRef = useRef(null);
-
   const answerBeforeSpeechRef = useRef('');
 
   /* =======================================================
@@ -254,11 +250,8 @@ export default function InterviewScreen({ route, navigation }) {
       const speech = new Utterance(question);
 
       speech.lang = 'en-IN';
-
       speech.rate = 0.9;
-
       speech.pitch = 1;
-
       speech.volume = 1;
 
       speech.onstart = () => {
@@ -322,11 +315,8 @@ export default function InterviewScreen({ route, navigation }) {
     }
 
     recognition.lang = 'en-IN';
-
     recognition.continuous = true;
-
     recognition.interimResults = false;
-
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
@@ -486,11 +476,8 @@ export default function InterviewScreen({ route, navigation }) {
       const speech = new Utterance(correctAnswer);
 
       speech.lang = 'en-IN';
-
       speech.rate = 0.9;
-
       speech.pitch = 1;
-
       speech.volume = 1;
 
       speech.onstart = () => {
@@ -590,7 +577,9 @@ export default function InterviewScreen({ route, navigation }) {
                           : styles.readButtonText
                       }
                     >
-                      {isSpeaking ? '⏹️ Stop Reading' : '🔊 Read Question'}
+                      {isSpeaking
+                        ? '\u23F9\uFE0F Stop Reading'
+                        : '\uD83D\uDD0A Read Question'}
                     </Text>
                   </TouchableOpacity>
                 ) : null}
@@ -653,7 +642,7 @@ export default function InterviewScreen({ route, navigation }) {
                     activeOpacity={0.8}
                   >
                     <Text style={styles.voiceIcon}>
-                      {isListening ? '⏹️' : '🎙️'}
+                      {isListening ? '\u23F9\uFE0F' : '\uD83C\uDFA4'}
                     </Text>
 
                     <View style={styles.voiceInfo}>
@@ -729,7 +718,9 @@ export default function InterviewScreen({ route, navigation }) {
                     onPress={readCorrectAnswer}
                     activeOpacity={0.8}
                   >
-                    <Text style={styles.listenButtonText}>🔊 Listen</Text>
+                    <Text style={styles.listenButtonText}>
+                      {'\uD83D\uDD0A'} Listen
+                    </Text>
                   </TouchableOpacity>
                 ) : null}
               </View>

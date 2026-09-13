@@ -10,7 +10,12 @@ import {
   Platform,
 } from 'react-native';
 
-const API_URL = 'http://localhost:5000';
+const API_URL =
+  typeof window !== 'undefined' &&
+  window.location.hostname !== 'localhost' &&
+  window.location.hostname !== '127.0.0.1'
+    ? 'https://ai-interview-bhta.onrender.com'
+    : 'http://localhost:5000';
 
 export default function ResultScreen({ route, navigation }) {
   const params = route?.params || {};
@@ -1307,3 +1312,4 @@ const styles = StyleSheet.create({
     height: 30,
   },
 });
+
