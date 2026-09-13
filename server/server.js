@@ -3,6 +3,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 
+/* =================================
+   ENVIRONMENT CONFIGURATION
+================================= */
+
 dotenv.config({
   path: path.resolve(__dirname, '../.env'),
 });
@@ -11,16 +15,31 @@ console.log('NVIDIA key loaded:', !!process.env.NVIDIA_API_KEY);
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+/* =================================
+   MIDDLEWARE
+================================= */
+
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }),
+);
+
+app.use(express.json({ limit: '1mb' }));
+
+/* =================================
+   NVIDIA CONFIGURATION
+================================= */
 
 const NVIDIA_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 
 const MODEL = 'openai/gpt-oss-20b';
 
-/* ================================
+/* =================================
    NVIDIA AI FUNCTION
-================================ */
+================================= */
 
 async function askNvidia(prompt) {
   if (!process.env.NVIDIA_API_KEY) {
@@ -74,19 +93,21 @@ async function askNvidia(prompt) {
   return answer;
 }
 
-/* ================================
-   HOME TEST
-================================ */
+/* =================================
+   HEALTH CHECK
+================================= */
 
 app.get('/', (req, res) => {
   res.json({
+    status: 'success',
     message: 'AI Interview backend is running!',
+    model: MODEL,
   });
 });
 
-/* ================================
+/* =================================
    GENERATE QUESTION
-================================ */
+================================= */
 
 app.post('/generate-question', async (req, res) => {
   try {
@@ -129,9 +150,9 @@ Return only the question.
   }
 });
 
-/* ================================
+/* =================================
    GENERATE CORRECT ANSWER
-================================ */
+================================= */
 
 app.post('/generate-correct-answer', async (req, res) => {
   try {
@@ -183,9 +204,9 @@ Requirements:
   }
 });
 
-/* ================================
+/* =================================
    REVIEW ANSWER
-================================ */
+================================= */
 
 app.post('/review-answer', async (req, res) => {
   try {
@@ -251,7 +272,7 @@ Rules:
 
     const rawAnswer = await askNvidia(prompt);
 
-    let cleaned = rawAnswer
+    const cleaned = rawAnswer
       .replace(/```json/gi, '')
       .replace(/```/g, '')
       .trim();
@@ -270,12 +291,12 @@ Rules:
   }
 });
 
-/* ================================
+/* =================================
    START SERVER
-================================ */
+================================= */
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Backend server running at http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Backend server running on port ${PORT}`);
 });
